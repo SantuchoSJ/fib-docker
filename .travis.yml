@@ -1,0 +1,30 @@
+language: generic
+
+#Not needed anymore?
+sudo: required
+
+#Needs docker
+services:
+  - docker
+
+#Builds react image to test
+before_install:
+  - docker build -t santucho/react-test -f ./client/Dockerfile.dev ./client
+
+# Run tests on react
+script:
+  - docker run -e CI=true santucho/react-test npm test
+
+#Build production images for each service
+after_success:
+  - docker build -t santucho/fib-client ./client
+  - docker build -t santucho/fib-api ./api
+  - docker build -t santucho/fib-nginx ./nginx
+  - docker build -t santucho/fib-worker ./worker
+  #Log in to the docker CLI
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+  #Take those images and push them to docker hub
+  - docker push santucho/fib-client
+  - docker push santucho/fib-api
+  - docker push santucho/fib-nginx
+  - docker push santucho/fib-worker
