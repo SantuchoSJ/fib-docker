@@ -28,3 +28,15 @@ after_success:
   - docker push santucho/fib-api
   - docker push santucho/fib-nginx
   - docker push santucho/fib-worker
+
+deploy:
+  provider: elasticbeanstalk
+  region: us-east-2
+  app: fib-docker
+  env: Fibdocker-env
+  bucket_name: elasticbeanstalk-us-east-2-433879732555
+  bucket_path: fib-docker
+  on:
+    branch: main
+  access_key_id: $AWS_ACCESS_KEY
+  secret_access_key: $AWS_SECRET_KEY
